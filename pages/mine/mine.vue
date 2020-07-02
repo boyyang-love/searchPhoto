@@ -14,11 +14,19 @@
 				</view>
 			</form>
 			<view class="otherLogin">
-				<button type="default" open-type="getUserInfo" @getuserinfo='getUserInfo'><text class="iconfont icon-weixindenglu"></text></button>
+				<button type="default" open-type="getUserInfo" @getuserinfo='getUserInfo' @click="ToCenter"><text class="iconfont icon-weixindenglu"></text></button>
 			</view>
 		</view>
 		<view class="loged" v-if="isshow">
-			<text>this is loged</text>
+			<view class="headImage" @click="changeImage">
+				<image :src="img" mode=""></image>
+			</view>
+			<view class="nickName">
+				<text>{{nickName}}</text>
+			</view>
+			<view class="imgShare">
+
+			</view>
 		</view>
 	</view>
 </template>
@@ -28,10 +36,35 @@
 		data() {
 			return {
 				show: true,
-				isshow: false
+				isshow: false,
+				nickName: '',
+				img: '',
 			};
 		},
 		methods: {
+			changeImage() {
+				let self = this
+				uni.chooseImage({
+					count: 1,
+					sizeType: ['original', 'compressed'],
+					sourceType: ['album'],
+					success: function(res) {
+						let imgUrl = res.tempFilePaths[0]
+						self.img = imgUrl
+						uniCloud.callFunction({
+							name: 'imgUpload',
+							data: {
+								imgurl: imgUrl,
+								nickname: self.nickName
+							}
+						})
+					}
+				});
+			},
+			ToCenter() {
+				this.show = false
+				this.isshow = true
+			},
 			formSubmit(e) {
 				let self = this
 				let username = e.detail.value.username
@@ -47,14 +80,28 @@
 						})
 					} else {
 						uniCloud.callFunction({
-							name: "register",
+							name: "login",
 							data: e.detail.value,
 							success: (res) => {
-								uni.showToast({
-									title: '注册成功'
+								uni.showModal({
+									title: res.result.mes.reback,
+									showCancel: false,
+									mask: true
 								})
-								this.show = false
-								this.isshow = true
+								//没有账号自动跳到注册页面
+								setTimeout(function() {
+									if (res.result.mes.isRegister == true) {
+										uni.navigateTo({
+											url: '/pages/register/register'
+										});
+									}
+								}, 2000);
+								//登录成功
+								if (res.result.mes.ToCenter == true) {
+									this.show = false
+									this.isshow = true
+									this.nickName = username
+								}
 								console.log(res)
 
 							}
@@ -70,7 +117,6 @@
 				}
 			},
 			getUserInfo(e) {
-				console.log(e)
 				this.show = false
 				this.isshow = true
 			},
@@ -79,6 +125,7 @@
 </script>
 
 <style lang='less'>
+	/* 登录界面样式 */
 	.container {
 		.otherLogin {
 			width: 100%;
@@ -153,6 +200,36 @@
 				input {
 					margin-left: 55rpx;
 				}
+			}
+		}
+	}
+
+	/* 个人中心样式 */
+	.loged {
+		width: 100%;
+
+		.nickName {
+			width: 100%;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			margin-top: 35rpx;
+			font-size: 55rpx;
+		}
+
+		.headImage {
+			width: 100%;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			margin-top: 35rpx;
+
+			image {
+				width: 300rpx;
+				height: 300rpx;
+				border-radius: 100%;
+				border: 10rpx solid white;
+				box-shadow: 0rpx 3rpx 5rpx 0rpx rgba(0, 0, 0, 0.4);
 			}
 		}
 	}

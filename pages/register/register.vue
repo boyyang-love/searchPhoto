@@ -28,7 +28,7 @@
 	export default {
 		data() {
 			return {
-				
+
 			};
 		},
 		methods: {
@@ -36,53 +36,60 @@
 				let username = e.detail.value.username
 				let password = e.detail.value.password
 				let repassword = e.detail.value.repassword
-				if(username && password && repassword){
-					if(password.length < 6 || password.length >10){
+				if (username && password && repassword) {
+					if (password.length < 6 || password.length > 10) {
 						uni.showModal({
 							title: '错误提示',
 							content: "密码位数在6~10位",
 							mask: true,
-							showCancel:false
+							showCancel: false
 						})
-					}else{
-						if(password === repassword){
+					} else {
+						if (password === repassword) {
 							uniCloud.callFunction({
 								name: 'register',
-								data : e.detail.value,
-								
+								data: e.detail.value,
+
 								success: (res) => {
 									uni.showModal({
-										title: res.result.mes,
-										showCancel:false
+										title: res.result.mes.reback,
+										showCancel: false
 									})
 									console.log(res)
+									setTimeout(function() {
+										if (res.result.mes.isLogin == true) {
+											uni.switchTab({
+												url: '/pages/mine/mine'
+											});
+										}
+									}, 2000);
 								},
-								
+
 								fail: (err) => {
 									uni.showModal({
-										title:'错误提示',
-										content:'注册失败',
+										title: '错误提示',
+										content: '注册失败',
 										mask: true,
-										showCancel:false
+										showCancel: false
 									})
 								}
 							})
-						}else{
+						} else {
 							uni.showModal({
 								title: '错误提示',
 								content: "两次密码不一致",
 								mask: true,
-								showCancel:false
+								showCancel: false
 							})
 						}
 					}
-					
-				}else{
+
+				} else {
 					uni.showModal({
 						title: '错误提示',
 						content: "每项为必填项",
 						mask: true,
-						showCancel:false
+						showCancel: false
 					})
 				}
 			},
@@ -147,6 +154,7 @@
 			flex-direction: column;
 			justify-content: center;
 			align-items: center;
+
 			view {
 				display: flex;
 				justify-content: flex-start;

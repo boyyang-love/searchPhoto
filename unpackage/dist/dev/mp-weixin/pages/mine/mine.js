@@ -155,15 +155,48 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 var _default =
 {
   data: function data() {
     return {
       show: true,
-      isshow: false };
+      isshow: false,
+      nickName: '',
+      img: '' };
 
   },
   methods: {
+    changeImage: function changeImage() {
+      var self = this;
+      uni.chooseImage({
+        count: 1,
+        sizeType: ['original', 'compressed'],
+        sourceType: ['album'],
+        success: function success(res) {
+          var imgUrl = res.tempFilePaths[0];
+          self.img = imgUrl;
+          uniCloud.callFunction({
+            name: 'imgUpload',
+            data: {
+              imgurl: imgUrl,
+              nickname: self.nickName } });
+
+
+        } });
+
+    },
+    ToCenter: function ToCenter() {
+      this.show = false;
+      this.isshow = true;
+    },
     formSubmit: function formSubmit(e) {var _this = this;
       var self = this;
       var username = e.detail.value.username;
@@ -179,14 +212,28 @@ var _default =
 
         } else {
           uniCloud.callFunction({
-            name: "register",
+            name: "login",
             data: e.detail.value,
             success: function success(res) {
-              uni.showToast({
-                title: '注册成功' });
+              uni.showModal({
+                title: res.result.mes.reback,
+                showCancel: false,
+                mask: true });
 
-              _this.show = false;
-              _this.isshow = true;
+              //没有账号自动跳到注册页面
+              setTimeout(function () {
+                if (res.result.mes.isRegister == true) {
+                  uni.navigateTo({
+                    url: '/pages/register/register' });
+
+                }
+              }, 2000);
+              //登录成功
+              if (res.result.mes.ToCenter == true) {
+                _this.show = false;
+                _this.isshow = true;
+                _this.nickName = username;
+              }
               console.log(res);
 
             } });
@@ -202,7 +249,6 @@ var _default =
       }
     },
     getUserInfo: function getUserInfo(e) {
-      console.log(e);
       this.show = false;
       this.isshow = true;
     } } };exports.default = _default;

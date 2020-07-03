@@ -25,9 +25,12 @@ exports.main = async (event, context) => {
 					isRegister: false
 				}
 			} else {
+				console.log(surePassword)
 				return {
 					reback: "登录成功",
-					ToCenter: true
+					ToCenter: true,
+					img: surePassword.data[0].imgurl,
+					sign: surePassword.data[0].sign
 				}
 			}
 

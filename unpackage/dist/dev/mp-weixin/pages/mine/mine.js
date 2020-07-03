@@ -130,7 +130,15 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(uni, uniCloud) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0; //
+/* WEBPACK VAR INJECTION */(function(uniCloud, uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0; //
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -165,20 +173,62 @@ __webpack_require__.r(__webpack_exports__);
 //
 var _default =
 {
+  components: {},
+
+
   data: function data() {
     return {
       show: true,
       isshow: false,
       nickName: '',
-      img: '' };
+      img: '',
+      photoWall: '',
+      isChangeSign: false,
+      sign: '' };
 
   },
   methods: {
+    // 更改个性签名确定按钮
+    sureSign: function sureSign() {
+      this.isChangeSign = false;
+      uniCloud.callFunction({
+        name: 'changeSign',
+        data: {
+          nickname: this.nickName,
+          sign: this.sign },
+
+        success: function success(res) {
+          // console.log(res)
+          uni.showToast({
+            title: res.result.mes });
+
+        } });
+
+    },
+    // 清除输入框中的内容
+    clearnSign: function clearnSign() {var _this = this;
+      uni.showModal({
+        title: "提示",
+        content: "清除签名所有内容",
+        success: function success(res) {
+          if (res.confirm) {
+            _this.sign = '';
+          } else if (res.cancel) {
+            return;
+          }
+        } });
+
+    },
+    //  个性签名点击事件
+    changeSign: function changeSign() {
+      this.isChangeSign = true;
+    },
+    // 更改头像事件
     changeImage: function changeImage() {
       var self = this;
       uni.chooseImage({
         count: 1,
-        sizeType: ['original', 'compressed'],
+        sizeType: ['compressed'],
         sourceType: ['album'],
         success: function success(res) {
           var imgUrl = res.tempFilePaths[0];
@@ -197,11 +247,11 @@ var _default =
       this.show = false;
       this.isshow = true;
     },
-    formSubmit: function formSubmit(e) {var _this = this;
+    formSubmit: function formSubmit(e) {var _this2 = this;
       var self = this;
       var username = e.detail.value.username;
       var password = e.detail.value.password;
-      console.log(e);
+      // console.log(e)
       if (username && password) {
         if (password.length < 6 || password.length > 10) {
           uni.showModal({
@@ -230,12 +280,12 @@ var _default =
               }, 2000);
               //登录成功
               if (res.result.mes.ToCenter == true) {
-                _this.show = false;
-                _this.isshow = true;
-                _this.nickName = username;
+                _this2.show = false;
+                _this2.isshow = true;
+                _this2.nickName = username;
+                _this2.img = res.result.mes.img;
+                _this2.sign = res.result.mes.sign;
               }
-              console.log(res);
-
             } });
 
         }
@@ -252,7 +302,7 @@ var _default =
       this.show = false;
       this.isshow = true;
     } } };exports.default = _default;
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"], __webpack_require__(/*! ./node_modules/@dcloudio/vue-cli-plugin-uni/packages/uni-cloud/dist/index.js */ 26)["default"]))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/vue-cli-plugin-uni/packages/uni-cloud/dist/index.js */ 26)["default"], __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
 
 /***/ }),
 
